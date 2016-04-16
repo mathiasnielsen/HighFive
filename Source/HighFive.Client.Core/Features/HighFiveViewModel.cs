@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using GalaSoft.MvvmLight.Command;
+using HighFive.Client.Core.Http;
 
 namespace HighFive.Client.Core.Features
 {
@@ -26,9 +27,15 @@ namespace HighFive.Client.Core.Features
 
         public RelayCommand HighFiveCommand { get; }
 
-        private void ExecuteHighFive()
+        private async void ExecuteHighFive()
         {
-            HighFiveMessage = $"You hit me! Time: {DateTime.Now.ToString("yyyy MMM dd HH:mm")}";
+            var clientFactory = new HttpClientFactory();
+            var executor = new HttpRequestExecutor(clientFactory);
+
+            var name = "Ole Kirkegaard";
+            var result = await executor.Get<string>(string.Format("{0}/{1}", "http://highfiveapp.azurewebsites.net/api/highfive", name));
+
+            HighFiveMessage = result;
         }
     }
 }
