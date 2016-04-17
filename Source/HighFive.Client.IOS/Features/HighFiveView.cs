@@ -11,9 +11,14 @@ namespace HighFive.Client.IOS.Features
     public class HighFiveView : ViewBase<HighFiveViewModel>
     {
         private List<Binding> bindings = new List<Binding>();
+        private UITapGestureRecognizer tabGesture;
+
         private int margin = 40;
 
+        private UITextField NameTextField { get; set; }
+
         private UIButton HighFiveButton { get; set; }
+
         private UILabel HighFiveMessageLabel { get; set; }
 
         protected override HighFiveViewModel OnPrepareViewModel()
@@ -25,8 +30,32 @@ namespace HighFive.Client.IOS.Features
         {
             Title = ViewModel.Title;
 
+            PrepareNameTextField();
             PrepareHighFiveButton();
             PrepareHighFiveMessage();
+
+            tabGesture = new UITapGestureRecognizer(ViewTapped);
+            View.AddGestureRecognizer(tabGesture);
+        }
+
+        private void ViewTapped(UITapGestureRecognizer obj)
+        {
+            NameTextField.ResignFirstResponder();
+        }
+
+        private void PrepareNameTextField()
+        {
+            NameTextField = new UITextField();
+
+            NameTextField.Frame = new CGRect(margin, 40, View.Bounds.Width, 30);
+
+            bindings.Add(this.SetBinding(
+                () => ViewModel.Name,
+                () => NameTextField.Text,
+                BindingMode.TwoWay)
+                .UpdateTargetTrigger(nameof(NameTextField.EditingChanged)));
+
+            ContentView.AddSubview(NameTextField);
         }
 
         private void PrepareHighFiveMessage()
@@ -51,7 +80,7 @@ namespace HighFive.Client.IOS.Features
         private void PrepareHighFiveButton()
         {
             HighFiveButton = new UIButton(UIButtonType.System);
-            HighFiveButton.Frame = new CGRect(margin, 40, View.Frame.Width, 30);
+            HighFiveButton.Frame = new CGRect(margin, 100, View.Frame.Width, 30);
             HighFiveButton.SetTitle("Hit a High Five!", UIControlState.Normal);
 
             HighFiveButton.SetCommand(nameof(HighFiveButton.TouchUpInside), ViewModel.HighFiveCommand);

@@ -12,6 +12,7 @@ namespace HighFive.Server.Api
         protected void Application_Start()
         {
             GlobalConfiguration.Configure(WebApiConfig.Register);
+            ////Application[""]
         }
     }
 }

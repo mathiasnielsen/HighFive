@@ -18,24 +18,51 @@ namespace HighFive.Client.Core.Features
             set { Set(ref highFiveMessage, value); }
         }
 
+        private string name;
+
+        public string Name
+        {
+            get
+            {
+                return name;
+            }
+
+            set
+            {
+                Set(ref name, value);
+                HighFiveCommand.RaiseCanExecuteChanged();
+            }
+        }
+
         public HighFiveViewModel()
         {
             Title = "High five!";
 
-            HighFiveCommand = new RelayCommand(ExecuteHighFive);
+            HighFiveCommand = new RelayCommand(ExecuteHighFive, CanHighFiveExecute);
+
+#if DEBUG
+            name = "Ole Kirkegaard";
+#endif
         }
 
         public RelayCommand HighFiveCommand { get; }
 
         private async void ExecuteHighFive()
         {
+            IsLoading = true;
             var clientFactory = new HttpClientFactory();
             var executor = new HttpRequestExecutor(clientFactory);
 
-            var name = "Ole Kirkegaard";
-            var result = await executor.Get<string>(string.Format("{0}/{1}", "http://highfiveapp.azurewebsites.net/api/highfive", name));
+            var result = await executor.Get<string>(string.Format("{0}/{1}", "http://highfiveapp.azurewebsites.net/api/highfive", Name));
 
             HighFiveMessage = result;
+
+            IsLoading = false;
+        }
+
+        private bool CanHighFiveExecute()
+        {
+            return IsLoading == false && string.IsNullOrWhiteSpace(Name) == false;
         }
     }
 }
