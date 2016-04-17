@@ -84,6 +84,7 @@
     <CodesignKey>iPhone Distribution</CodesignKey>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="External\EasyLayout.cs" />
     <Compile Include="Features\HighFiveView.cs" />
     <Compile Include="Features\ViewBase.cs" />
     <Compile Include="Main.cs" />

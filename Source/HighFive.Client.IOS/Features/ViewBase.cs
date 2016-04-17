@@ -4,6 +4,7 @@ using System.Text;
 using Foundation;
 using GalaSoft.MvvmLight.Helpers;
 using HighFive.Client.Core.Features;
+using Praeclarum.UI;
 using UIKit;
 
 namespace HighFive.Client.IOS.Features
@@ -18,7 +19,7 @@ namespace HighFive.Client.IOS.Features
 
         public ViewBase()
         {
-            View.BackgroundColor = UIColor.White;
+            View.BackgroundColor = UIColor.FromRGB(255, 216, 0);
 
             AutomaticallyAdjustsScrollViewInsets = false;
             EdgesForExtendedLayout = UIRectEdge.None;
@@ -44,32 +45,14 @@ namespace HighFive.Client.IOS.Features
         {
             ContentView = new UIView();
             ContentView.Frame = new CoreGraphics.CGRect(View.Frame.Location, View.Frame.Size);
-            ContentView.BackgroundColor = UIColor.FromRGB(255, 216, 0);
-
-            spinner = new UIActivityIndicatorView();
-            spinner.Hidden = true;
-            spinner.Frame = new CoreGraphics.CGRect(0, 0, 40, 40);
-            spinner.AutoresizingMask = UIViewAutoresizing.FlexibleMargins;
-            spinner.Color = UIColor.Green;
-            bindings.Add(this.SetBinding(
-                () => ViewModel.IsLoading).WhenSourceChanges(
-                () =>
-                {
-                    if (ViewModel.IsLoading)
-                    {
-                        spinner.StartAnimating();
-                        spinner.Hidden = false;
-                    }
-                    else
-                    {
-                        spinner.StopAnimating();
-                        spinner.Hidden = true;
-                    }
-                }));
-
-            ContentView.AddSubview(spinner);
-
             View.AddSubview(ContentView);
+
+            var margin = 20;
+            View.ConstrainLayout(() =>
+                ContentView.Frame.Top == View.Frame.Top + margin
+                && ContentView.Frame.Left == View.Frame.Left + margin
+                && ContentView.Frame.Right == View.Frame.Right - margin
+                && ContentView.Frame.Bottom == View.Frame.Bottom - margin);
 
             OnPrepareUIElements();
         }
