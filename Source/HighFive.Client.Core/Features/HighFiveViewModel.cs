@@ -50,6 +50,8 @@ namespace HighFive.Client.Core.Features
         private async void ExecuteHighFive()
         {
             IsLoading = true;
+            HighFiveMessage = "Loading...";
+
             var clientFactory = new HttpClientFactory();
             var executor = new HttpRequestExecutor(clientFactory);
 

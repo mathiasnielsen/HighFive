@@ -8,7 +8,13 @@ namespace HighFive.Client.Core.Features
 {
     public abstract class ViewModelBase : GalaSoft.MvvmLight.ViewModelBase
     {
-        public bool IsLoading { get; set; }
+        private bool isLoading;
+
+        public bool IsLoading
+        {
+            get { return isLoading; }
+            set { Set(ref isLoading, value); }
+        }
 
         public string Title { get; set; }
     }

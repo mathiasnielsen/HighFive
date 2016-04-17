@@ -15,6 +15,8 @@ namespace HighFive.Client.IOS.Features
 
         private int margin = 40;
 
+        private UIView FlashView;
+
         private UITextField NameTextField { get; set; }
 
         private UIButton HighFiveButton { get; set; }
@@ -30,12 +32,24 @@ namespace HighFive.Client.IOS.Features
         {
             Title = ViewModel.Title;
 
+            PrepareFlashView();
             PrepareNameTextField();
             PrepareHighFiveButton();
             PrepareHighFiveMessage();
 
             tabGesture = new UITapGestureRecognizer(ViewTapped);
             View.AddGestureRecognizer(tabGesture);
+        }
+
+        private void PrepareFlashView()
+        {
+            FlashView = new UIView();
+            FlashView.Frame = ContentView.Frame;
+            FlashView.BackgroundColor = UIColor.White;
+            FlashView.UserInteractionEnabled = false;
+            FlashView.Hidden = true;
+
+            ContentView.AddSubview(FlashView);
         }
 
         private void ViewTapped(UITapGestureRecognizer obj)
@@ -46,8 +60,9 @@ namespace HighFive.Client.IOS.Features
         private void PrepareNameTextField()
         {
             NameTextField = new UITextField();
+            NameTextField.BackgroundColor = UIColor.White;
 
-            NameTextField.Frame = new CGRect(margin, 40, View.Bounds.Width, 30);
+            NameTextField.Frame = new CGRect(margin, 40, View.Bounds.Width - margin * 2, 30);
 
             bindings.Add(this.SetBinding(
                 () => ViewModel.Name,
@@ -63,7 +78,7 @@ namespace HighFive.Client.IOS.Features
             HighFiveMessageLabel = new UILabel();
 
             var doubleMargin = margin * 2;
-            HighFiveMessageLabel.Frame = new CGRect(margin, 200, View.Frame.Width - doubleMargin, 100);
+            HighFiveMessageLabel.Frame = new CGRect(margin, 240, View.Frame.Width - doubleMargin, 100);
 
             HighFiveMessageLabel.TextAlignment = UITextAlignment.Center;
             HighFiveMessageLabel.Lines = 0;
@@ -73,19 +88,46 @@ namespace HighFive.Client.IOS.Features
                 () => HighFiveMessageLabel.Text));
 
             HighFiveMessageLabel.Text = "No slaps yet.";
+            NameTextField.ResignFirstResponder();
 
             ContentView.AddSubview(HighFiveMessageLabel);
         }
 
         private void PrepareHighFiveButton()
         {
-            HighFiveButton = new UIButton(UIButtonType.System);
-            HighFiveButton.Frame = new CGRect(margin, 100, View.Frame.Width, 30);
-            HighFiveButton.SetTitle("Hit a High Five!", UIControlState.Normal);
+            HighFiveButton = new UIButton();
+            HighFiveButton.SetImage(UIImage.FromFile(string.Format("Assets/highfive_hand")), UIControlState.Normal);
+            HighFiveButton.ImageView.ContentMode = UIViewContentMode.ScaleAspectFit;
 
-            HighFiveButton.SetCommand(nameof(HighFiveButton.TouchUpInside), ViewModel.HighFiveCommand);
+            HighFiveButton.Frame = new CGRect(0, 100, ContentView.Frame.Width, 150);
+
+            ////HighFiveButton.SetCommand(nameof(HighFiveButton.TouchUpInside), ViewModel.HighFiveCommand);
+            HighFiveButton.TouchUpInside += HighFiveButton_TouchUpInside;
 
             ContentView.AddSubview(HighFiveButton);
+        }
+
+        private void HighFiveButton_TouchUpInside(object sender, EventArgs e)
+        {
+            if (ViewModel.HighFiveCommand.CanExecute("Not empty string"))
+            {
+
+                FlashView.Hidden = false;
+                FlashView.Alpha = 1;
+                ContentView.BringSubviewToFront(FlashView);
+                UIView.Animate(
+                    0.4,
+                   () =>
+                   {
+                       FlashView.Alpha = 0;
+                   },
+                   () =>
+                   {
+                       FlashView.Hidden = true;
+                   });
+
+                ViewModel.HighFiveCommand.Execute(null);
+            }
         }
     }
 }
