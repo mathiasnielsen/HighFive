@@ -31,6 +31,7 @@ namespace HighFive.Client.IOS.Features
         {
             Title = ViewModel.Title;
 
+
             PrepareFlashView();
             PrepareNameTextField();
             PrepareHighFiveButton();
